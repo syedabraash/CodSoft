@@ -9,9 +9,21 @@ To use the chatbot, you need to have Python installed on your computer. You can 
 <h3>Installation</h3>
 
 1. Clone the repository to your local machine:
+
+   ```sh
    git clone https://github.com/your-username/table-tennis-chatbot.git
 
+2. Navigate to the project directory:
+   ```sh
+   cd table-tennis-chatbot
 
+3. Install the required dependencies:
+   ```sh
+   pip install -r requirements.txt
+
+4. Run the chatbot:
+   ```sh
+   python chatbot.py
 
 
 <h3>Usage</h3>
