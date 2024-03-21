@@ -1,14 +1,12 @@
 import re
 import random
 
-# Define responses for greetings
 greetings_responses = [
     "Hello! How can I help you with your table tennis queries?",
     "Hi there! Ready to talk about table tennis?",
     "Hey! What table tennis questions do you have?",
 ]
 
-# Define responses for table tennis questions
 table_tennis_responses = {
     "serve": "In table tennis, the serve is the starting shot of a point. It must bounce once on the server's side and once on the opponent's side of the table.",
     "rally": "A rally in table tennis is a sequence of shots between the server and the receiver until a point is won or lost.",
@@ -48,31 +46,24 @@ table_tennis_responses = {
     "table tennis serve return faults": "Table tennis serve return faults occur when a player fails to return the opponent's serve within the rules, such as failing to make a legal return or failing to keep the ball in play.",
 }
 
-# Define responses for unrecognized queries
 default_responses = [
     "I'm sorry, I didn't understand your question. Can you please rephrase?",
     "Hmm, I'm not sure what you're asking. Could you provide more details?",
     "I'm still learning about table tennis. Could you ask me something else?",
 ]
 
-# Function to respond to user inputs
 def chatbot(user_input):
-    # Convert user input to lowercase for easier processing
     user_input = user_input.lower()
 
-    # Check for greetings
     if any(greeting in user_input for greeting in ["hello", "hi", "hey", "howdy", "hola"]):
         return random.choice(greetings_responses)
 
-    # Check for table tennis related questions
     for keyword, response in table_tennis_responses.items():
         if re.search(r'\b' + re.escape(keyword) + r'\b', user_input):
             return response
 
-    # If no specific question recognized, return a default response
     return random.choice(default_responses)
 
-# Main function to run the chatbot
 def main():
     print("Welcome to the Table Tennis Chatbot!")
     print("Ask me anything about table tennis, or just say hello!")
@@ -84,7 +75,6 @@ def main():
             break
         else:
             print("Bot:", chatbot(user_input))
-
-# Run the chatbot
+#
 if __name__ == "__main__":
     main()
