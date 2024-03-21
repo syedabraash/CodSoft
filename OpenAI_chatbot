@@ -1,6 +1,6 @@
 from openai import OpenAI
 
-API_KEY = "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"
+API_KEY = "############################################################33"
 
 client = OpenAI(
     api_key = API_KEY
@@ -33,4 +33,3 @@ while(True):
     answer = ask(question)
     print('\n')
     print(f'bot: {answer}')
-    print('\n')
