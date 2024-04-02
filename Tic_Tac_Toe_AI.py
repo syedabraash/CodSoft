@@ -1,114 +1,103 @@
-import copy
-
-EMPTY = 0
-X = 1
-O = -1
-
-def initialize_board():
-    return [[EMPTY, EMPTY, EMPTY],
-            [EMPTY, EMPTY, EMPTY],
-            [EMPTY, EMPTY, EMPTY]]
+import math
 
 def print_board(board):
-    for row in board:
-        print(" | ".join(["X" if cell == X else "O" if cell == O else " " for cell in row]))
-        print("-" * 5)
+    print("Current State Of Board : \n")
+    for i in range(0, 9):
+        if (i > 0) and (i % 3) == 0:
+            print("\n")
+        if board[i] == 0:
+            print("- ", end=" ")
+        if board[i] == 1:
+            print("O ", end=" ")
+        if board[i] == -1:
+            print("X ", end=" ")
+    print("\n\n")
 
-def is_board_full(board):
-    for row in board:
-        if EMPTY in row:
-            return False
-    return True
 
-def check_win(board, player):
-    for row in board:
-        if all(cell == player for cell in row):
-            return True
-    for col in range(3):
-        if all(board[row][col] == player for row in range(3)):
-            return True
-    if all(board[i][i] == player for i in range(3)) or all(board[i][2-i] == player for i in range(3)):
-        return True
-    return False
+def get_user_move(board, player):
+    while True:
+        try:
+            pos = int(input(f"Enter {player}'s position from [1...9]: "))
+            if pos < 1 or pos > 9 or board[pos - 1] != 0:
+                print("Invalid move! Please try again.")
+            else:
+                return pos - 1
+        except ValueError:
+            print("Invalid input! Please enter a number.")
 
-def minimax(board, depth, maximizing_player):
-    if check_win(board, X):
-        return 10 - depth
-    elif check_win(board, O):
-        return -10 + depth
-    elif is_board_full(board):
+
+def minimax(board, player):
+    x = analyze_board(board)
+    if x != 0:
+        return x * player
+    pos = -1
+    value = -2
+    for i in range(0, 9):
+        if board[i] == 0:
+            board[i] = player
+            score = -minimax(board, player * -1)
+            board[i] = 0
+            if score > value:
+                value = score
+                pos = i
+    if pos == -1:
         return 0
+    return value
 
-    if maximizing_player:
-        max_eval = float("-inf")
-        for i in range(3):
-            for j in range(3):
-                if board[i][j] == EMPTY:
-                    board[i][j] = X
-                    eval = minimax(board, depth + 1, False)
-                    board[i][j] = EMPTY  # Revert the move
-                    max_eval = max(max_eval, eval)
-        return max_eval
-    else:
-        min_eval = float("inf")
-        for i in range(3):
-            for j in range(3):
-                if board[i][j] == EMPTY:
-                    board[i][j] = O
-                    eval = minimax(board, depth + 1, True)
-                    board[i][j] = EMPTY  # Revert the move
-                    min_eval = min(min_eval, eval)
-        return min_eval
 
-def find_best_move(board):
-    best_move = None
-    best_eval = float("-inf")
-    for i in range(3):
-        for j in range(3):
-            if board[i][j] == EMPTY:
-                board_copy = copy.deepcopy(board)  # Create a copy of the board
-                board_copy[i][j] = X  # Make the move on the copied board
-                eval = minimax(board_copy, 0, False)  # Evaluate the copied board
-                if eval > best_eval:
-                    best_eval = eval
-                    best_move = (i, j)
-    return best_move
+def get_comp_move(board):
+    pos = -1
+    value = -2
+    for i in range(0, 9):
+        if board[i] == 0:
+            board[i] = 1
+            score = -minimax(board, -1)
+            board[i] = 0
+            if score > value:
+                value = score
+                pos = i
+    return pos
 
-def play_game():
-    board = initialize_board()
-    current_player = X
-    while not is_board_full(board) and not check_win(board, X) and not check_win(board, O):
-        print_board(board)
-        print("Current player:", "AI" if current_player == X else "Human")
-        if current_player == X:
-            print("AI's turn:")
-            ai_move = find_best_move(board)
-            print("AI's move:", ai_move)
-            board[ai_move[0]][ai_move[1]] = X
-        else:
-            print("Your turn (enter row and column numbers separated by space):")
-            valid_move = False
-            while not valid_move:
-                try:
-                    row, col = map(int, input().split())
-                    if board[row][col] == EMPTY:
-                        board[row][col] = O
-                        valid_move = True
-                    else:
-                        print("Invalid move! Try again.")
-                except ValueError:
-                    print("Invalid input! Please enter row and column numbers separated by space.")
-                except IndexError:
-                    print("Invalid input! Row and column numbers should be between 0 and 2.")
 
-        current_player *= -1
+def analyze_board(board):
+    cb = [[0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]]
+    for i in range(0, 8):
+        if board[cb[i][0]] != 0 and board[cb[i][0]] == board[cb[i][1]] and board[cb[i][0]] == board[cb[i][2]]:
+            return board[cb[i][2]]
+    return 0
 
+
+def main():
+    choice = input("Enter 1 for single player, 2 for multiplayer: ")
+    choice = int(choice)
+    board = [0] * 9
+    player = 1 if choice == 1 else -1
+    print("Computer : O Vs. You : X") if choice == 1 else print("Player 1: X Vs. Player 2: O")
     print_board(board)
-    if check_win(board, X):
-        print("AI wins!")
-    elif check_win(board, O):
-        print("You win!")
+    while True:
+        if analyze_board(board) != 0:
+            break
+        if choice == 1:
+            if player == 1:
+                pos = get_user_move(board, 'X')
+                board[pos] = -1
+            else:
+                pos = get_comp_move(board)
+                board[pos] = 1
+            player *= -1
+        else:
+            pos = get_user_move(board, 'X' if player == 1 else 'O')
+            board[pos] = player
+            player *= -1
+        print_board(board)
+    result = analyze_board(board)
+    if result == -1:
+        print("X Wins!!! O Loose !!!")
+    elif result == 1:
+        print("X Loose!!! O Wins !!!!")
     else:
-        print("It's a draw!")
+        print("Draw!!!")
 
-play_game()
+
+if __name__ == "__main__":
+    main()
